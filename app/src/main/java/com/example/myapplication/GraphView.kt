@@ -21,6 +21,8 @@ class GraphView : View, GraphManager.AnimationListener {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec) / 2
+        graphManager.graph().width = width
+        graphManager.graph().height = height
         setMeasuredDimension(width, height)
     }
 
@@ -32,7 +34,6 @@ class GraphView : View, GraphManager.AnimationListener {
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawColor(Color.BLACK)
         graphManager.getDrawManager().draw(canvas)
     }
 

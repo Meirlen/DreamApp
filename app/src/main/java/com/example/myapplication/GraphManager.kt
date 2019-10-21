@@ -12,7 +12,7 @@ class GraphManager(context: Context, listener: AnimationListener) {
         const val TAG = "AnimationManager"
     }
 
-    private val drawManager = DrawManager()
+    private val drawManager = DrawManager(context)
     private var animationManager: AnimationManager = AnimationManager(drawManager.graph)
 
     init {

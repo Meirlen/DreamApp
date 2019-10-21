@@ -1,23 +1,45 @@
 package com.example.myapplication.draw
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
+import android.util.Log
+import androidx.core.content.ContextCompat
+import com.example.myapplication.R
 import com.example.myapplication.animation.AnimationManager
 import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.Graph
 
-class DrawController(var graph: Graph) {
+
+class DrawController(private var graph: Graph, private var context: Context) {
+    companion object {
+        private const val TAG = "DrawController"
+    }
 
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var animValue: AnimValue? = null
+    private var coordPath = Path()
+    private var testPath = Path()
+    private var p = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
         init()
     }
 
     fun draw(canvas: Canvas) {
+        coordPath.reset()
         drawGraph(canvas)
+        canvas.drawPath(coordPath, pathPaint)
+        canvas.drawPath(coordPath, pathPaint)
+        // угол
+        testPath.moveTo(100f, 100f)
+        testPath.lineTo(150f, 200f)
+        testPath.lineTo(250f, 300f)
+        canvas.drawPath(testPath, p)
+
     }
 
     fun updateValue(animValue: AnimValue) {
@@ -25,6 +47,11 @@ class DrawController(var graph: Graph) {
     }
 
     private fun drawGraph(canvas: Canvas) {
+
+        coordPath.moveTo(
+            0 + graph.padding.toFloat(),
+            graph.height.toFloat() + graph.padding.toFloat()
+        )
 
         animValue?.let {
 
@@ -38,12 +65,16 @@ class DrawController(var graph: Graph) {
                 //anim
                 drawGraph(canvas, runningAnimationPosition, true)
             }
+
         }
 
 
     }
 
     private fun drawGraph(canvas: Canvas, position: Int, isAnimation: Boolean) {
+
+        //  mainRect.set(0f, 0f, graph.width.toFloat(), graph.height.toFloat())
+        //  canvas.drawRect(mainRect, fillPaint)
 
         val drawDataList = graph.drawDataList
         if (drawDataList == null || position > drawDataList.size - 1) {
@@ -52,21 +83,34 @@ class DrawController(var graph: Graph) {
 
         val drawData = drawDataList[position]
 
-        val startX = drawData.startX
-        val startY = drawData.startY
+        val startX = calculateX(drawData.startX)
+        val startY = calculateY(drawData.startY)
 
-        var stopX = drawData.stopX
-        var stopY = drawData.stopY
+        val stopX: Int
+        val stopY: Int
 
         if (isAnimation) {
-            stopX = animValue!!.x
-            stopY = animValue!!.y
+            stopX = calculateX(animValue!!.x)
+            stopY = calculateY(animValue!!.y)
+            drawGraph(canvas, startX, startY, stopX, stopY)
+        } else {
+            stopX = calculateX(drawData.stopX)
+            stopY = calculateY(drawData.stopY)
+            drawGraph(canvas, startX, startY, stopX, stopY)
+            drawPath(stopX, stopY)
         }
-
-        drawGraph(canvas, startX, startY, stopX, stopY)
-
     }
 
+
+    private fun drawPath(startX: Int, startY: Int) {
+        Log.d(TAG, "x $startX y =$startY")
+        coordPath.lineTo(startX.toFloat(), startY.toFloat())
+        coordPath.lineTo(startX.toFloat(),graph.height.toFloat())
+        coordPath.moveTo(
+            0 + graph.padding.toFloat(),
+            graph.height.toFloat() + graph.padding.toFloat()
+        )
+    }
 
     private fun drawGraph(canvas: Canvas, startX: Int, startY: Int, stopX: Int, stopY: Int) {
 
@@ -81,10 +125,25 @@ class DrawController(var graph: Graph) {
     }
 
 
-    private fun init() {
+    private fun calculateY(y: Int) = (graph.height - graph.padding) - y
 
-        linePaint.color = Color.YELLOW
-        linePaint.strokeWidth = 6f
+    private fun calculateX(x: Int) = (graph.padding + graph.valueBarWidth) + x
+
+    private fun init() {
+        val res = context.resources
+        graph.padding = res.getDimension(R.dimen.graph_view_padding).toInt()
+        graph.valueBarWidth = res.getDimension(R.dimen.value_bar_width).toInt()
+
+        linePaint.color = ContextCompat.getColor(context, R.color.colorAccent)
+        linePaint.style = Paint.Style.STROKE
+        linePaint.strokeWidth = 4f
+
+        pathPaint.color =ContextCompat.getColor(context, R.color.colorAccent)
+        pathPaint.style = Paint.Style.FILL
+        pathPaint.strokeWidth = 4f
+
+        p.style = Paint.Style.FILL
+        p.color = Color.WHITE
 
     }
 }
