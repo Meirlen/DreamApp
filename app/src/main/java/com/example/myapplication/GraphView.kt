@@ -5,18 +5,17 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
+import com.example.myapplication.data.DrawData
 
 class GraphView : View, GraphManager.AnimationListener {
 
 
-    private val graphManager = GraphManager(context,this)
+    private val graphManager = GraphManager(context, this)
 
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    init {
-    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -25,6 +24,12 @@ class GraphView : View, GraphManager.AnimationListener {
         setMeasuredDimension(width, height)
     }
 
+    fun setData(drawDataList: ArrayList<DrawData>) {
+        graphManager.animate()
+        val graph = graphManager.graph()
+        graph.drawDataList = drawDataList
+        graphManager.animate()
+    }
 
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(Color.BLACK)
@@ -34,7 +39,5 @@ class GraphView : View, GraphManager.AnimationListener {
     override fun onAnimationUpdated() {
         invalidate()
     }
-
-
 
 }

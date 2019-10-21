@@ -1,35 +1,60 @@
 package com.example.myapplication.animation
 
+import android.animation.Animator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
-
+import android.animation.AnimatorSet
 import android.view.animation.AccelerateDecelerateInterpolator
+import com.example.myapplication.data.AnimValue
+import com.example.myapplication.data.DrawData
+import com.example.myapplication.data.Graph
+import java.util.ArrayList
 
-class AnimationManager {
+class AnimationManager(var graph: Graph) {
 
     companion object {
 
-        const val TAG = "AnimationManager"
         const val PROPERTY_X = "PROPERTY_X"
         const val PROPERTY_Y = "PROPERTY_Y"
         const val PROPERTY_ALPHA = "PROPERTY_ALPHA"
         const val ALPHA_START = 0
         const val ALPHA_END = 255
-        const val ANIMATION_DURATION = 2500L
+        const val ANIMATION_DURATION = 250L
+        const val VALUE_NONE = -1
+
     }
 
-    private var listener: ((Int, Int) -> Unit)? = null
+    private var listener: ((AnimValue) -> Unit)? = null
+    private lateinit var animatorSet: AnimatorSet
 
-    fun setListener(listener: (Int, Int) -> Unit) {
+    fun setListener(listener: (AnimValue) -> Unit) {
         this.listener = listener
-        createAnimator()
+    }
+
+    fun animate() {
+        animatorSet = AnimatorSet()
+        animatorSet.playSequentially(createAnimatorList())
+        animatorSet.start()
+    }
+
+    private fun createAnimatorList(): List<Animator> {
+
+        val drawDataList = graph.drawDataList
+        val animatorList = ArrayList<Animator>()
+
+        drawDataList?.map {
+            animatorList.add(createAnimator(it))
+        }
+
+        return animatorList
+
     }
 
 
-    fun createAnimator() {
+    private fun createAnimator(drawData: DrawData): Animator {
 
-        val propertyX = PropertyValuesHolder.ofInt(PROPERTY_X, 120, 800)
-        val propertyY = PropertyValuesHolder.ofInt(PROPERTY_Y, 30, 500)
+        val propertyX = PropertyValuesHolder.ofInt(PROPERTY_X, drawData.startX, drawData.stopX)
+        val propertyY = PropertyValuesHolder.ofInt(PROPERTY_Y, drawData.startY, drawData.stopY)
         val propertyAlpha = PropertyValuesHolder.ofInt(PROPERTY_ALPHA, ALPHA_START, ALPHA_END)
 
         val animator = ValueAnimator()
@@ -37,20 +62,36 @@ class AnimationManager {
         animator.duration = ANIMATION_DURATION
         animator.interpolator = AccelerateDecelerateInterpolator()
 
-
         animator.addUpdateListener { valueAnimator ->
-            onAnimationUpdate(animator)
+            onAnimationUpdate(valueAnimator)
         }
-        animator.start()
+
+        return animator
     }
 
-    private fun onAnimationUpdate(animator: ValueAnimator) {
+    private fun onAnimationUpdate(valueAnimator: ValueAnimator) {
+        if (listener == null) {
+            return
+        }
 
-        val x = animator.getAnimatedValue(PROPERTY_X) as Int
-        val y = animator.getAnimatedValue(PROPERTY_Y) as Int
+        val x = valueAnimator.getAnimatedValue(PROPERTY_X) as Int
+        val y = valueAnimator.getAnimatedValue(PROPERTY_Y) as Int
+        val runningAnimationPosition = getRunningAnimationPosition()
 
-        listener?.invoke(x, y)
+        val value = AnimValue(x, y, runningAnimationPosition)
+        listener?.invoke(value)
     }
 
+    private fun getRunningAnimationPosition(): Int {
+        val childAnimations = animatorSet.childAnimations
+        for (i in childAnimations.indices) {
+            val animator = childAnimations[i]
+            if (animator.isRunning) {
+                return i
+            }
+        }
+
+        return VALUE_NONE
+    }
 
 }
