@@ -12,15 +12,25 @@ class GraphManager(context: Context, listener: AnimationListener) {
         const val TAG = "AnimationManager"
     }
 
-    private var animationManager: AnimationManager = AnimationManager()
     private val drawManager = DrawManager()
+    private var animationManager: AnimationManager = AnimationManager(drawManager.graph)
 
     init {
-        animationManager.setListener { x, y ->
-            drawManager.update(x, y)
+        animationManager.setListener { animValue ->
+            drawManager.update(animValue)
             listener.onAnimationUpdated()
         }
     }
+
+    fun animate() {
+        drawManager.graph.drawDataList?.let {
+            if (it.isNotEmpty()) {
+                animationManager.animate()
+            }
+        }
+    }
+
+    fun graph() = drawManager.graph
 
     interface AnimationListener {
         fun onAnimationUpdated()
