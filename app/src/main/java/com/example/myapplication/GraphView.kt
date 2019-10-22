@@ -1,8 +1,7 @@
 package com.example.myapplication
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.example.myapplication.data.DrawData
@@ -30,7 +29,10 @@ class GraphView : View, GraphManager.AnimationListener {
         graphManager.animate()
         val graph = graphManager.graph()
         graph.drawDataList = drawDataList
+
+
         graphManager.animate()
+
     }
 
     override fun onDraw(canvas: Canvas) {

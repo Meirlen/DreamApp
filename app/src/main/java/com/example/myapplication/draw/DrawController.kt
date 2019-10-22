@@ -11,6 +11,12 @@ import com.example.myapplication.R
 import com.example.myapplication.animation.AnimationManager
 import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.Graph
+import android.graphics.Shader
+import android.graphics.LinearGradient
+
+
+
+
 
 
 class DrawController(private var graph: Graph, private var context: Context) {
@@ -19,7 +25,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
     }
 
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private var animValue: AnimValue? = null
     private var coordPath = Path()
     private var testPath = Path()
@@ -38,7 +44,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
         testPath.moveTo(100f, 100f)
         testPath.lineTo(150f, 200f)
         testPath.lineTo(250f, 300f)
-        canvas.drawPath(testPath, p)
+        canvas.drawPath(testPath, pathPaint)
 
     }
 
@@ -139,11 +145,11 @@ class DrawController(private var graph: Graph, private var context: Context) {
         linePaint.strokeWidth = 4f
 
         pathPaint.color =ContextCompat.getColor(context, R.color.colorAccent)
+        p.shader = LinearGradient(0f, 0f, 0f, graph.height.toFloat(), Color.YELLOW, Color.WHITE, Shader.TileMode.MIRROR)
         pathPaint.style = Paint.Style.FILL
         pathPaint.strokeWidth = 4f
 
         p.style = Paint.Style.FILL
         p.color = Color.WHITE
-
     }
 }
