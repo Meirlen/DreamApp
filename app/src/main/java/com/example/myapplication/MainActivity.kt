@@ -19,12 +19,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun playGraph() {
         val drawDataList = arrayListOf<DrawData>()
-        drawDataList.add(DrawData(0, 100, 0, 100))
+        drawDataList.add(DrawData(50, 100, 50, 100))
         drawDataList.add(DrawData(100, 200, 100, 100))
         drawDataList.add(DrawData(200, 400, 100, 290))
         drawDataList.add(DrawData(400, 490, 290, 390))
         drawDataList.add(DrawData(490, 530, 390, 250))
         drawDataList.add(DrawData(530, 800, 250, 320))
-        //graphView.setData(drawDataList)
+         graphView.setData(drawDataList)
     }
 }
