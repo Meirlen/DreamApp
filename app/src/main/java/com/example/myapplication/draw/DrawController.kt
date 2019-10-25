@@ -1,13 +1,11 @@
 package com.example.myapplication.draw
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import com.example.myapplication.R
 import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.Graph
+import android.graphics.drawable.GradientDrawable
 
 
 class DrawController(private var graph: Graph, private var context: Context) {
@@ -29,12 +27,16 @@ class DrawController(private var graph: Graph, private var context: Context) {
     private var verticalBarItemsCount = 7
     private var singleStepValue = 0
 
+    private var gdBoundsRect = Rect()
+    private val gradientDrawable = GradientDrawable()
+
+
+
     init {
         init()
     }
 
     fun draw(canvas: Canvas) {
-
 
         graphPath.reset()
 
@@ -43,6 +45,27 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
         drawVerticalBar(canvas)
 
+        createGradient(canvas)
+
+    }
+
+    private fun createGradient(canvas: Canvas) {
+        val topY = graph.padding
+        val leftX = graph.padding + graph.valueBarWidth * 2
+        val rightX = graph.width
+        val bottomY = graph.height - graph.padding
+
+        gdBoundsRect.set(leftX, topY, rightX, bottomY)
+
+        gradientDrawable.bounds = gdBoundsRect
+        gradientDrawable.shape = GradientDrawable.RECTANGLE
+        gradientDrawable.colors =
+            intArrayOf(Color.parseColor("#2BB3A4"), Color.parseColor("#0F1D2A"))
+        gradientDrawable.gradientType = GradientDrawable.LINEAR_GRADIENT
+        gradientDrawable.orientation = (GradientDrawable.Orientation.TL_BR)
+        gradientDrawable.alpha = 50
+        gradientDrawable.setSize(graph.width, graph.height)
+        gradientDrawable.draw(canvas)
     }
 
     fun updateValue(animValue: AnimValue) {
@@ -64,7 +87,13 @@ class DrawController(private var graph: Graph, private var context: Context) {
             val title = "$ $amount"
             canvas.drawText(title, x, y, paintTitle)
 
-            canvas.drawLine(x +  graph.valueBarWidth * 2  , y , graph.width.toFloat() , y , paintHorizontalLines)
+            canvas.drawLine(
+                x + graph.valueBarWidth * 2,
+                y,
+                graph.width.toFloat(),
+                y,
+                paintHorizontalLines
+            )
         }
 
     }
