@@ -62,8 +62,8 @@ class DrawController(private var graph: Graph, private var context: Context) {
         gradientDrawable.colors =
             intArrayOf(Color.parseColor("#2BB3A4"), Color.parseColor("#0F1D2A"))
         gradientDrawable.gradientType = GradientDrawable.LINEAR_GRADIENT
-        gradientDrawable.orientation = (GradientDrawable.Orientation.TL_BR)
-        gradientDrawable.alpha = 50
+        gradientDrawable.orientation = (GradientDrawable.Orientation.TOP_BOTTOM)
+        gradientDrawable.alpha = 80
         gradientDrawable.setSize(graph.width, graph.height)
         gradientDrawable.draw(canvas)
     }
@@ -167,7 +167,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
         pathPaint.color = res.getColor(R.color.colorAccent)
         pathPaint.style = Paint.Style.STROKE
-        pathPaint.strokeWidth = 4f
+        pathPaint.strokeWidth = 6f
 
         paintHorizontalLines.color = res.getColor(R.color.colorPrimaryText)
         paintHorizontalLines.style = Paint.Style.STROKE
