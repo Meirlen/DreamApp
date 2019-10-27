@@ -6,6 +6,7 @@ import com.example.myapplication.R
 import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.Graph
 import android.graphics.drawable.GradientDrawable
+import com.example.myapplication.custom.GraphGradientDrawable
 
 
 class DrawController(private var graph: Graph, private var context: Context) {
@@ -28,8 +29,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
     private var singleStepValue = 0
 
     private var gdBoundsRect = Rect()
-    private val gradientDrawable = GradientDrawable()
-
+    private val gradientDrawable2 = GraphGradientDrawable()
 
 
     init {
@@ -50,22 +50,18 @@ class DrawController(private var graph: Graph, private var context: Context) {
     }
 
     private fun createGradient(canvas: Canvas) {
+
+        gradientDrawable2.setUp(graphPath)
+
         val topY = graph.padding
         val leftX = graph.padding + graph.valueBarWidth * 2
         val rightX = graph.width
         val bottomY = graph.height - graph.padding
 
         gdBoundsRect.set(leftX, topY, rightX, bottomY)
+        gradientDrawable2.bounds = gdBoundsRect
+        gradientDrawable2.draw(canvas)
 
-        gradientDrawable.bounds = gdBoundsRect
-        gradientDrawable.shape = GradientDrawable.RECTANGLE
-        gradientDrawable.colors =
-            intArrayOf(Color.parseColor("#2BB3A4"), Color.parseColor("#0F1D2A"))
-        gradientDrawable.gradientType = GradientDrawable.LINEAR_GRADIENT
-        gradientDrawable.orientation = (GradientDrawable.Orientation.TOP_BOTTOM)
-        gradientDrawable.alpha = 80
-        gradientDrawable.setSize(graph.width, graph.height)
-        gradientDrawable.draw(canvas)
     }
 
     fun updateValue(animValue: AnimValue) {
@@ -164,17 +160,19 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
         graph.padding = res.getDimension(R.dimen.graph_view_padding).toInt()
         graph.valueBarWidth = res.getDimension(R.dimen.value_bar_width).toInt()
+        graph.textSize = res.getDimension(R.dimen.graph_text_size)
+        graph.strokeHeight = res.getDimension(R.dimen.graph_stroke_height)
 
         pathPaint.color = res.getColor(R.color.colorAccent)
         pathPaint.style = Paint.Style.STROKE
-        pathPaint.strokeWidth = 6f
+        pathPaint.strokeWidth = graph.strokeHeight
 
         paintHorizontalLines.color = res.getColor(R.color.colorPrimaryText)
         paintHorizontalLines.style = Paint.Style.STROKE
-        paintHorizontalLines.strokeWidth = 0.5f
+        paintHorizontalLines.strokeWidth = res.getDimension(R.dimen.line_height)
 
         paintTitle.style = Paint.Style.FILL
-        paintTitle.textSize = 30f
+        paintTitle.textSize = graph.textSize
         paintTitle.color = res.getColor(R.color.colorPrimaryText)
 
     }

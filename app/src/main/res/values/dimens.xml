@@ -2,4 +2,7 @@
 <resources>
     <dimen name="graph_view_padding">16dp</dimen>
     <dimen name="value_bar_width">30dp</dimen>
+    <dimen name="graph_text_size">12sp</dimen>
+    <dimen name="graph_stroke_height">2dp</dimen>
+    <dimen name="line_height">0.2dp</dimen>
 </resources>

@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         drawDataList.add(DrawData(200, 400, 100, 290))
         drawDataList.add(DrawData(400, 490, 290, 390))
         drawDataList.add(DrawData(490, 530, 390, 250))
-        drawDataList.add(DrawData(530, 800, 250, 320))
-         graphView.setData(drawDataList)
+        drawDataList.add(DrawData(530, 600, 250, 320))
+        graphView.setData(drawDataList)
     }
 }
