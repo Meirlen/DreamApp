@@ -7,5 +7,6 @@ class Graph(
     var padding: Int = 0,
     var valueBarWidth: Int = 0,
     var textSize: Float = 0f,
+    var filterTitleSize: Float = 0f,
     var strokeHeight: Float = 0f
 )

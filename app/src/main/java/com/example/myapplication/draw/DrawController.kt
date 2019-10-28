@@ -5,8 +5,8 @@ import android.graphics.*
 import com.example.myapplication.R
 import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.Graph
-import android.graphics.drawable.GradientDrawable
 import com.example.myapplication.custom.GraphGradientDrawable
+import com.example.myapplication.data.Filter
 
 
 class DrawController(private var graph: Graph, private var context: Context) {
@@ -16,20 +16,22 @@ class DrawController(private var graph: Graph, private var context: Context) {
     }
 
     private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
-    private val paintTitle = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val paintValueBarTitle = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val paintFilterTitle = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintHorizontalLines = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    private var animValue: AnimValue? = null
-    private var graphPath = Path()
 
     private var bottomX: Float = 0f
     private var bottomY: Float = 0F
-
     private var verticalBarItemsCount = 7
     private var singleStepValue = 0
+    private val filterSize = Filter.values().size
+
 
     private var gdBoundsRect = Rect()
-    private val gradientDrawable2 = GraphGradientDrawable()
+    private val gradientDrawable = GraphGradientDrawable()
+    private var graphPath = Path()
+    private var animValue: AnimValue? = null
 
 
     init {
@@ -38,20 +40,16 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
     fun draw(canvas: Canvas) {
 
-        graphPath.reset()
-
-        drawGraph()
-        canvas.drawPath(graphPath, pathPaint)
-
+        drawGraph(canvas)
         drawVerticalBar(canvas)
-
-        createGradient(canvas)
+        drawGradient(canvas)
+        drawFilter(canvas)
 
     }
 
-    private fun createGradient(canvas: Canvas) {
+    private fun drawGradient(canvas: Canvas) {
 
-        gradientDrawable2.setUp(graphPath)
+        gradientDrawable.setUp(graphPath)
 
         val topY = graph.padding
         val leftX = graph.padding + graph.valueBarWidth * 2
@@ -59,8 +57,8 @@ class DrawController(private var graph: Graph, private var context: Context) {
         val bottomY = graph.height - graph.padding
 
         gdBoundsRect.set(leftX, topY, rightX, bottomY)
-        gradientDrawable2.bounds = gdBoundsRect
-        gradientDrawable2.draw(canvas)
+        gradientDrawable.bounds = gdBoundsRect
+        gradientDrawable.draw(canvas)
 
     }
 
@@ -68,6 +66,23 @@ class DrawController(private var graph: Graph, private var context: Context) {
         this.animValue = animValue
     }
 
+    private fun drawFilter(canvas: Canvas) {
+
+        val sellSize = (graph.width - graph.padding) / filterSize
+
+        var x: Float
+        val y = graph.padding.toFloat()
+
+        repeat(filterSize) { position ->
+
+            x = graph.padding.toFloat()
+            x += sellSize * position
+            val filterTitle = Filter.values()[position].title
+            canvas.drawText(filterTitle, x, y, paintFilterTitle)
+
+        }
+
+    }
 
     private fun drawVerticalBar(canvas: Canvas) {
 
@@ -81,7 +96,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
             val amount = step * 1000
             val title = "$ $amount"
-            canvas.drawText(title, x, y, paintTitle)
+            canvas.drawText(title, x, y, paintValueBarTitle)
 
             canvas.drawLine(
                 x + graph.valueBarWidth * 2,
@@ -95,7 +110,9 @@ class DrawController(private var graph: Graph, private var context: Context) {
     }
 
 
-    private fun drawGraph() {
+    private fun drawGraph(canvas: Canvas) {
+
+        graphPath.reset()
 
         bottomX = calculateX(0)
         bottomY = calculateY(0)
@@ -106,6 +123,9 @@ class DrawController(private var graph: Graph, private var context: Context) {
             val runningAnimationPosition = animValue!!.runningAnimationPosition
             drawPathGraph(runningAnimationPosition)
         }
+
+        canvas.drawPath(graphPath, pathPaint)
+
 
     }
 
@@ -154,6 +174,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
     private fun calculateX(x: Int) = ((graph.padding + graph.valueBarWidth) + x).toFloat()
 
+
     private fun init() {
 
         val res = context.resources
@@ -161,6 +182,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
         graph.padding = res.getDimension(R.dimen.graph_view_padding).toInt()
         graph.valueBarWidth = res.getDimension(R.dimen.value_bar_width).toInt()
         graph.textSize = res.getDimension(R.dimen.graph_text_size)
+        graph.filterTitleSize = res.getDimension(R.dimen.filter_text_size)
         graph.strokeHeight = res.getDimension(R.dimen.graph_stroke_height)
 
         pathPaint.color = res.getColor(R.color.colorAccent)
@@ -171,9 +193,13 @@ class DrawController(private var graph: Graph, private var context: Context) {
         paintHorizontalLines.style = Paint.Style.STROKE
         paintHorizontalLines.strokeWidth = res.getDimension(R.dimen.line_height)
 
-        paintTitle.style = Paint.Style.FILL
-        paintTitle.textSize = graph.textSize
-        paintTitle.color = res.getColor(R.color.colorPrimaryText)
+        paintValueBarTitle.style = Paint.Style.FILL
+        paintValueBarTitle.textSize = graph.textSize
+        paintValueBarTitle.color = res.getColor(R.color.colorPrimaryText)
+        // mMonthTitlePaint.textAlign = Paint.Align.CENTER
+
+        paintFilterTitle.textSize = graph.filterTitleSize
+        paintFilterTitle.color = res.getColor(R.color.colorPrimaryText)
 
     }
 }
