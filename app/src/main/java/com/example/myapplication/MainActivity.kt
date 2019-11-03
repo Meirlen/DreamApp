@@ -3,6 +3,7 @@ package com.example.myapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.myapplication.data.DrawData
+import com.example.myapplication.data.InputData
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,13 +19,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playGraph() {
-        val drawDataList = arrayListOf<DrawData>()
-        drawDataList.add(DrawData(50, 100, 50, 100))
-        drawDataList.add(DrawData(100, 200, 100, 100))
-        drawDataList.add(DrawData(200, 400, 100, 290))
-        drawDataList.add(DrawData(400, 490, 290, 390))
-        drawDataList.add(DrawData(490, 530, 390, 250))
-        drawDataList.add(DrawData(530, 600, 250, 320))
-        graphView.setData(drawDataList)
+        val inputDataList = arrayListOf<InputData>()
+        inputDataList.add(InputData(50))
+        inputDataList.add(InputData(30))
+        inputDataList.add(InputData(20))
+        inputDataList.add(InputData(15))
+        inputDataList.add(InputData(32))
+        inputDataList.add(InputData(80))
+        inputDataList.add(InputData(50))
+        graphView.setData(inputDataList)
     }
 }
