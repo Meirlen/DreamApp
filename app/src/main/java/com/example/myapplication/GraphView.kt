@@ -20,7 +20,7 @@ class GraphView : View, GraphManager.AnimationListener {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = MeasureSpec.getSize(widthMeasureSpec)
-        val height = MeasureSpec.getSize(heightMeasureSpec) / 2
+        val height = (MeasureSpec.getSize(heightMeasureSpec) / 2.2).toInt()
         graphManager.graph().width = width
         graphManager.graph().height = height
         setMeasuredDimension(width, height)

@@ -22,13 +22,11 @@ class DrawController(private var graph: Graph, private var context: Context) {
     private val pathLinePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val pathAddLinePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val paintValueBarTitle = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val paintFilterTitle = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintHorizontalLines = Paint(Paint.ANTI_ALIAS_FLAG)
 
 
     private var bottomX: Float = 0f
     private var bottomY: Float = 0F
-    private val filterSize = Filter.values().size
 
 
     private var gdBoundsRect = Rect()
@@ -47,7 +45,6 @@ class DrawController(private var graph: Graph, private var context: Context) {
 
         drawVerticalBar(canvas)
         drawGradient(canvas)
-        drawFilter(canvas)
         drawGraph(canvas)
 
     }
@@ -71,23 +68,6 @@ class DrawController(private var graph: Graph, private var context: Context) {
         this.animValue = animValue
     }
 
-    private fun drawFilter(canvas: Canvas) {
-
-        val sellSize = (graph.width - graph.padding) / filterSize
-
-        var x: Float
-        val y = graph.padding.toFloat()
-
-        repeat(filterSize) { position ->
-
-            x = graph.padding.toFloat()
-            x += sellSize * position
-            val filterTitle = Filter.values()[position].title
-            canvas.drawText(filterTitle, x, y, paintFilterTitle)
-
-        }
-
-    }
 
     private fun drawVerticalBar(canvas: Canvas) {
         val inputDataList = graph.inputDataList
@@ -99,7 +79,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
         val correctedMaxValue = getCorrectedMaxValue(maxValue)
         val value = correctedMaxValue.toFloat() / maxValue
 
-        val heightOffset = graph.filterHeight + graph.padding
+        val heightOffset = graph.padding
         val padding = graph.padding
         val height = graph.height - padding
         val width = graph.width.toFloat()
@@ -222,10 +202,8 @@ class DrawController(private var graph: Graph, private var context: Context) {
         val res = context.resources
 
         graph.padding = res.getDimension(R.dimen.graph_view_padding).toInt()
-        graph.filterHeight = res.getDimension(R.dimen.filter_height).toInt()
         graph.valueBarWidth = res.getDimension(R.dimen.value_bar_width).toInt()
         graph.textSize = res.getDimension(R.dimen.graph_text_size)
-        graph.filterTitleSize = res.getDimension(R.dimen.filter_text_size)
         graph.strokeHeight = res.getDimension(R.dimen.graph_stroke_height)
 
         pathFillPaint.color = Color.TRANSPARENT
@@ -248,9 +226,6 @@ class DrawController(private var graph: Graph, private var context: Context) {
         paintValueBarTitle.textSize = graph.textSize
         paintValueBarTitle.color = res.getColor(R.color.colorPrimaryText)
         // mMonthTitlePaint.textAlign = Paint.Align.CENTER
-
-        paintFilterTitle.textSize = graph.filterTitleSize
-        paintFilterTitle.color = res.getColor(R.color.colorPrimaryText)
 
     }
 }

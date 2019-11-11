@@ -83,7 +83,7 @@ private fun getCoordinateX(chart: Graph, index: Int): Int {
 fun getCoordinateY(graph: Graph, value: Float): Int {
 
     val height = graph.height
-    val heightOffset = graph.padding + graph.filterHeight
+    val heightOffset = graph.padding
 
     val heightCorrected = height - heightOffset
 
