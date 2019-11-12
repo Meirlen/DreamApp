@@ -4,7 +4,7 @@
     <dimen name="value_bar_width">30dp</dimen>
     <dimen name="filter_height">50dp</dimen>
     <dimen name="graph_text_size">10sp</dimen>
-    <dimen name="filter_text_size">12sp</dimen>
+    <dimen name="filter_text_size">10sp</dimen>
     <dimen name="graph_stroke_height">2dp</dimen>
     <dimen name="line_height">0.2dp</dimen>
     <dimen name="additional_line_height">6dp</dimen>

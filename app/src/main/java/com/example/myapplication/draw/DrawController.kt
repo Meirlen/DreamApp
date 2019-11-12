@@ -225,7 +225,6 @@ class DrawController(private var graph: Graph, private var context: Context) {
         paintValueBarTitle.style = Paint.Style.FILL
         paintValueBarTitle.textSize = graph.textSize
         paintValueBarTitle.color = res.getColor(R.color.colorPrimaryText)
-        // mMonthTitlePaint.textAlign = Paint.Align.CENTER
 
     }
 }
