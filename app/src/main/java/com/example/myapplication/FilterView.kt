@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import com.example.myapplication.data.Filter
 
@@ -43,12 +44,12 @@ class FilterView : View {
             x = padding.toFloat()
             x += (sellSize * position) + sellSize / 2
             val filterTitle = Filter.values()[position].title
-
             if (position == 3) {
                 drawSelectedItemBackground(canvas, sellSize, x, y)
                 drawTextCentred(canvas, selectedTitlePaint, filterTitle, x, y)
             } else
                 drawTextCentred(canvas, titlePaint, filterTitle, x, y)
+
 
         }
     }
@@ -65,6 +66,19 @@ class FilterView : View {
         paint.getTextBounds(text, 0, text.length, textBounds)
         canvas.drawText(text, cx, cy - textBounds.exactCenterY(), paint)
     }
+
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_UP) {
+                  getSelectedFilterFromLocation(event.x,event.y)
+        }
+        return true
+    }
+
+    private fun getSelectedFilterFromLocation(x: Float, y: Float) {
+
+    }
+
 
     private fun init() {
 
