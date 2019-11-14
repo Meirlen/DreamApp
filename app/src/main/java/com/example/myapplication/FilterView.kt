@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import com.example.myapplication.data.Filter
@@ -15,6 +16,7 @@ class FilterView : View {
     private val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var selectedPosition = 0
 
 
     constructor(context: Context) : super(context)
@@ -34,25 +36,32 @@ class FilterView : View {
     }
 
     override fun onDraw(canvas: Canvas) {
-        val sellSize = (width - padding) / filterSize
+        drawFilter(canvas)
+    }
+
+    private fun drawFilter(canvas: Canvas) {
+
+        val sellWidth = getSellWidth()
 
         var x: Float
         val y = height / 2f
 
         repeat(filterSize) { position ->
 
-            x = padding.toFloat()
-            x += (sellSize * position) + sellSize / 2
+            x = (sellWidth * position) + sellWidth / 2f
+
             val filterTitle = Filter.values()[position].title
-            if (position == 3) {
-                drawSelectedItemBackground(canvas, sellSize, x, y)
+
+            if (position == selectedPosition) {
+                drawSelectedItemBackground(canvas, sellWidth, x, y)
                 drawTextCentred(canvas, selectedTitlePaint, filterTitle, x, y)
             } else
                 drawTextCentred(canvas, titlePaint, filterTitle, x, y)
 
-
         }
+
     }
+
 
     private fun drawSelectedItemBackground(canvas: Canvas, sellSize: Int, cx: Float, cy: Float) {
         val rectF =
@@ -70,15 +79,15 @@ class FilterView : View {
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_UP) {
-                  getSelectedFilterFromLocation(event.x,event.y)
+            selectedPosition = getSelectedFilterFromLocation(event.x)
+            invalidate()
         }
         return true
     }
 
-    private fun getSelectedFilterFromLocation(x: Float, y: Float) {
+    private fun getSelectedFilterFromLocation(ex: Float) = (ex / getSellWidth()).toInt()
 
-    }
-
+    private fun getSellWidth() = (width - padding) / filterSize
 
     private fun init() {
 
