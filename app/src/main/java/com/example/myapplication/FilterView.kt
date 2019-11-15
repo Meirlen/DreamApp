@@ -1,12 +1,19 @@
 package com.example.myapplication
 
+import android.animation.Animator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.example.myapplication.data.AnimValue
+import com.example.myapplication.data.DrawData
 import com.example.myapplication.data.Filter
+import com.example.myapplication.manager.Constans
+import java.text.FieldPosition
 
 class FilterView : View {
 
@@ -80,6 +87,8 @@ class FilterView : View {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_UP) {
             selectedPosition = getSelectedFilterFromLocation(event.x)
+            createAnimator()
+
             invalidate()
         }
         return true
@@ -88,6 +97,40 @@ class FilterView : View {
     private fun getSelectedFilterFromLocation(ex: Float) = (ex / getSellWidth()).toInt()
 
     private fun getSellWidth() = (width - padding) / filterSize
+
+
+    private fun createAnimator(fromPosition: Int , toPosition: Int): Animator {
+
+
+        val propertyX = PropertyValuesHolder.ofInt(Constans.PROPERTY_X, drawData.startX, drawData.stopX)
+        val propertyY = PropertyValuesHolder.ofInt(Constans.PROPERTY_Y, drawData.startY, drawData.stopY)
+        val propertyAlpha = PropertyValuesHolder.ofInt(
+            Constans.PROPERTY_ALPHA,
+            Constans.ALPHA_START,
+            Constans.ALPHA_END
+        )
+
+        val animator = ValueAnimator()
+        animator.setValues(propertyX, propertyY, propertyAlpha)
+        animator.duration = Constans.FILTER_ANIMATION_DURATION
+        animator.interpolator = AccelerateDecelerateInterpolator()
+
+        animator.addUpdateListener { valueAnimator ->
+            onAnimationUpdate(valueAnimator)
+        }
+
+        return animator
+    }
+
+
+    private fun onAnimationUpdate(valueAnimator: ValueAnimator) {
+
+        val x = valueAnimator.getAnimatedValue(Constans.PROPERTY_X) as Int
+        val y = valueAnimator.getAnimatedValue(Constans.PROPERTY_Y) as Int
+
+        val value = AnimValue(x, y, runningAnimationPosition)
+        listener?.invoke(value)
+    }
 
     private fun init() {
 

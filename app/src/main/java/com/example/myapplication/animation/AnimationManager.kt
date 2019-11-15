@@ -8,21 +8,18 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.DrawData
 import com.example.myapplication.data.Graph
+import com.example.myapplication.manager.Constans.ALPHA_END
+import com.example.myapplication.manager.Constans.ALPHA_START
+import com.example.myapplication.manager.Constans.ANIMATION_DURATION
+import com.example.myapplication.manager.Constans.PROPERTY_ALPHA
+import com.example.myapplication.manager.Constans.PROPERTY_X
+import com.example.myapplication.manager.Constans.PROPERTY_Y
+import com.example.myapplication.manager.Constans.VALUE_NONE
 import java.util.ArrayList
 
 class AnimationManager(var graph: Graph) {
 
-    companion object {
 
-        const val PROPERTY_X = "PROPERTY_X"
-        const val PROPERTY_Y = "PROPERTY_Y"
-        const val PROPERTY_ALPHA = "PROPERTY_ALPHA"
-        const val ALPHA_START = 0
-        const val ALPHA_END = 255
-        const val ANIMATION_DURATION = 200L
-        const val VALUE_NONE = -1
-
-    }
 
     private var listener: ((AnimValue) -> Unit)? = null
     private lateinit var animatorSet: AnimatorSet
