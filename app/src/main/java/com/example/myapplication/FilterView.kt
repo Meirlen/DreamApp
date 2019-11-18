@@ -14,6 +14,7 @@ import com.example.myapplication.data.AnimValue
 import com.example.myapplication.data.Filter
 import com.example.myapplication.manager.Constans
 import com.example.myapplication.manager.Constans.ALPHA_END
+import com.example.myapplication.manager.Constans.ALPHA_MIN
 import com.example.myapplication.manager.Constans.ALPHA_START
 import com.example.myapplication.manager.Constans.PROPERTY_ALPHA
 import com.example.myapplication.manager.Constans.PROPERTY_X
@@ -63,17 +64,8 @@ class FilterView : View {
         }
 
         repeat(filterSize) { position ->
-
             x = (sellWidth * position) + sellWidth / 2f
-
-            val filterTitle = Filter.values()[position].title
-
-            if (position == selectedPosition) {
-                //  drawSelectedItemBackground(canvas, sellWidth, x, y)
-                drawTextCentred(canvas, selectedTitlePaint, filterTitle, x, y)
-            } else
-                drawTextCentred(canvas, titlePaint, filterTitle, x, y)
-
+            drawTextCentred(canvas, titlePaint, getTitleByPosition(position), x, y)
         }
 
 
@@ -88,6 +80,8 @@ class FilterView : View {
             RectF(cx + sellSize / 3, cy + sellSize / 4, cx - sellSize / 3, cy - sellSize / 4)
         canvas.drawRoundRect(rectF, 10f, 10f, selectedCirclePaint)
         selectedCirclePaint.alpha = animValue?.alpha!!
+        drawTextCentred(canvas, selectedTitlePaint, getTitleByPosition(selectedPosition), x, y)
+
     }
 
 
@@ -110,6 +104,8 @@ class FilterView : View {
     }
 
     private fun getSelectedPositionFromLocation(ex: Float) = (ex / getSellWidth()).toInt()
+
+    private fun getTitleByPosition(position: Int) = Filter.values()[position].title
 
     private fun getSellWidth() = (width - padding) / filterSize
 
@@ -141,8 +137,12 @@ class FilterView : View {
         val x = valueAnimator.getAnimatedValue(PROPERTY_X) as Float
         val alpha = valueAnimator.getAnimatedValue(PROPERTY_ALPHA) as Int
         animValue!!.x = x.toInt()
-        animValue!!.alpha = alpha
+        if (alpha < ALPHA_MIN) {
+            animValue!!.alpha = ALPHA_END
 
+        } else {
+            animValue!!.alpha = alpha
+        }
         invalidate()
     }
 
