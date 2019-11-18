@@ -128,7 +128,7 @@ class DrawController(private var graph: Graph, private var context: Context) {
         if (animValue != null) {
             graphBackgroundPath.moveTo(bottomX, bottomY)
             val runningAnimationPosition = animValue!!.runningAnimationPosition
-            drawPathGraph(runningAnimationPosition)
+            drawPathGraph(runningAnimationPosition!!)
         }
 
         canvas.drawPath(graphAddLinePath, pathAddLinePaint)

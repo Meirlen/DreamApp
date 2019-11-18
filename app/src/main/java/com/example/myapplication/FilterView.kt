@@ -6,14 +6,17 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.example.myapplication.data.AnimValue
-import com.example.myapplication.data.DrawData
 import com.example.myapplication.data.Filter
 import com.example.myapplication.manager.Constans
-import java.text.FieldPosition
+import com.example.myapplication.manager.Constans.ALPHA_END
+import com.example.myapplication.manager.Constans.ALPHA_START
+import com.example.myapplication.manager.Constans.PROPERTY_ALPHA
+import com.example.myapplication.manager.Constans.PROPERTY_X
 
 class FilterView : View {
 
@@ -24,6 +27,8 @@ class FilterView : View {
     private val selectedTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val selectedCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var selectedPosition = 0
+    private var lastPosition = 0
+    private var animValue: AnimValue? = null
 
 
     constructor(context: Context) : super(context)
@@ -53,6 +58,10 @@ class FilterView : View {
         var x: Float
         val y = height / 2f
 
+        if (animValue != null) {
+            drawSelectedItemBackground(canvas)
+        }
+
         repeat(filterSize) { position ->
 
             x = (sellWidth * position) + sellWidth / 2f
@@ -60,20 +69,25 @@ class FilterView : View {
             val filterTitle = Filter.values()[position].title
 
             if (position == selectedPosition) {
-                drawSelectedItemBackground(canvas, sellWidth, x, y)
+                //  drawSelectedItemBackground(canvas, sellWidth, x, y)
                 drawTextCentred(canvas, selectedTitlePaint, filterTitle, x, y)
             } else
                 drawTextCentred(canvas, titlePaint, filterTitle, x, y)
 
         }
 
+
     }
 
 
-    private fun drawSelectedItemBackground(canvas: Canvas, sellSize: Int, cx: Float, cy: Float) {
+    private fun drawSelectedItemBackground(canvas: Canvas) {
+        val sellSize = getSellWidth()
+        val cy = height / 2f
+        val cx = animValue!!.x.toFloat()
         val rectF =
             RectF(cx + sellSize / 3, cy + sellSize / 4, cx - sellSize / 3, cy - sellSize / 4)
         canvas.drawRoundRect(rectF, 10f, 10f, selectedCirclePaint)
+        selectedCirclePaint.alpha = animValue?.alpha!!
     }
 
 
@@ -86,36 +100,36 @@ class FilterView : View {
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_UP) {
-            selectedPosition = getSelectedFilterFromLocation(event.x)
-            createAnimator()
+            lastPosition = selectedPosition
+            selectedPosition = getSelectedPositionFromLocation(event.x)
+            createAnimator(lastPosition, selectedPosition).start()
 
             invalidate()
         }
         return true
     }
 
-    private fun getSelectedFilterFromLocation(ex: Float) = (ex / getSellWidth()).toInt()
+    private fun getSelectedPositionFromLocation(ex: Float) = (ex / getSellWidth()).toInt()
 
     private fun getSellWidth() = (width - padding) / filterSize
 
 
-    private fun createAnimator(fromPosition: Int , toPosition: Int): Animator {
+    private fun createAnimator(fromPosition: Int, toPosition: Int): Animator {
 
 
-        val propertyX = PropertyValuesHolder.ofInt(Constans.PROPERTY_X, drawData.startX, drawData.stopX)
-        val propertyY = PropertyValuesHolder.ofInt(Constans.PROPERTY_Y, drawData.startY, drawData.stopY)
-        val propertyAlpha = PropertyValuesHolder.ofInt(
-            Constans.PROPERTY_ALPHA,
-            Constans.ALPHA_START,
-            Constans.ALPHA_END
-        )
+        val startX = fromPosition * getSellWidth() + getSellWidth() / 2f
+        val stopX = toPosition * getSellWidth() + getSellWidth() / 2f
+
+        val propertyX = PropertyValuesHolder.ofFloat(PROPERTY_X, startX, stopX)
+        val propertyAlpha = PropertyValuesHolder.ofInt(PROPERTY_ALPHA, ALPHA_END, ALPHA_START)
 
         val animator = ValueAnimator()
-        animator.setValues(propertyX, propertyY, propertyAlpha)
+        animator.setValues(propertyX, propertyAlpha)
         animator.duration = Constans.FILTER_ANIMATION_DURATION
         animator.interpolator = AccelerateDecelerateInterpolator()
 
         animator.addUpdateListener { valueAnimator ->
+            animValue = AnimValue(0, 0)
             onAnimationUpdate(valueAnimator)
         }
 
@@ -124,12 +138,12 @@ class FilterView : View {
 
 
     private fun onAnimationUpdate(valueAnimator: ValueAnimator) {
+        val x = valueAnimator.getAnimatedValue(PROPERTY_X) as Float
+        val alpha = valueAnimator.getAnimatedValue(PROPERTY_ALPHA) as Int
+        animValue!!.x = x.toInt()
+        animValue!!.alpha = alpha
 
-        val x = valueAnimator.getAnimatedValue(Constans.PROPERTY_X) as Int
-        val y = valueAnimator.getAnimatedValue(Constans.PROPERTY_Y) as Int
-
-        val value = AnimValue(x, y, runningAnimationPosition)
-        listener?.invoke(value)
+        invalidate()
     }
 
     private fun init() {
